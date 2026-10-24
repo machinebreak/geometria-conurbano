@@ -79,10 +79,23 @@ Sin esa configuración, el juego arranca igual y todo lo local anda.
 
 ## Publicarlo online
 
-Es HTML + JS estático, no necesita build. Los pasos para GitHub Pages están en [`DEPLOY.md`](DEPLOY.md).
+Es HTML + JS estático, no necesita build.
+
+| | |
+|---|---|
+| **Dominio** | https://gd.lauta.site |
+| **Cloudflare Pages** | https://geometria-conurbano.pages.dev |
+| **GitHub Pages** | https://machinebreak.github.io/geometria-conurbano |
+
+Los pasos completos están en [`DEPLOY.md`](DEPLOY.md).
+
+## Comunidad
+
+- **WhatsApp** — https://whatsapp.com/channel/0029VbDpnc1545uwf4F6ju0Z
+- **Discord** — https://discord.gg/7hbqkDmKHA
 
 ## Créditos
 
-Hecho por PuTop Games.
+Hecho por PuTop Games — hecho por lauta.
 
 Motor: [Phaser 3](https://phaser.io). Compresión: [pako](https://github.com/nodeca/pako).

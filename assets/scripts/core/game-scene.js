@@ -563,7 +563,27 @@ class GameScene extends Phaser.Scene {
     return icon;
   });
 
-    this._copyrightText = this.add.text(0, 630, "© 2026 PuTop Games", {
+    // --- Botones de comunidad (WhatsApp / Discord) en el menu principal ---
+    this._socialBadges = [];
+    const _communityDefs = [
+      { key: "btn_whatsapp", url: "https://whatsapp.com/channel/0029VbDpnc1545uwf4F6ju0Z" },
+      { key: "btn_discord", url: "https://discord.gg/7hbqkDmKHA" }
+    ];
+    const _communityScale = 0.76;
+    _communityDefs.forEach((def, i) => {
+      const badge = this.add.image(screenWidth - 200 - i * 100, screenHeight - 92, def.key)
+        .setScrollFactor(0)
+        .setDepth(30)
+        .setScale(_communityScale)
+        .setInteractive();
+      this._expandHitArea(badge, 1);
+      this._makeBouncyButton(badge, _communityScale, () => {
+        window.open(def.url, "_blank");
+      }, () => this._menuActive);
+      this._socialBadges.push(badge);
+    });
+
+    this._copyrightText = this.add.text(0, 630, "© 2026 PuTop · hecho por lauta", {
       fontSize: "14px",
       color: "#ffffff",
       fontFamily: "Arial"
@@ -5814,7 +5834,8 @@ _buildSettingsPopup() {
     const creditsEntries = [
       { text: "Geometria Conurbano", scale: 0.9, font: "bigFont" },
       { text: "Un juego de ritmo y plataformas", scale: 0.6, font: "goldFont" },
-      { text: "Hecho por PuTop Games", scale: 0.8, font: "goldFont" },
+      { text: "PuTop Games", scale: 0.8, font: "goldFont" },
+      { text: "Hecho por lauta", scale: 0.72, font: "goldFont", color: 0xaaddff },
       { text: "Motor: Phaser 3", scale: 0.6, font: "goldFont" },
       { text: "Compresión: pako", scale: 0.6, font: "goldFont" },
       { text: "Version 1.0", scale: 0.5, font: "goldFont" },
@@ -9509,7 +9530,7 @@ _applyMirrorEffect() {
       window.open("https://docs.phaser.io/", "_blank");
     }, () => !this._helpclose);
     this._helplayer.add(phaserlogo);
-    this._helplayer.add(this.add.bitmapText(containerX, 440, "goldFont", "Geometria Conurbano - hecho por PuTop Games", 22).setOrigin(0.5, 0.5));
+    this._helplayer.add(this.add.bitmapText(containerX, 440, "goldFont", "Geometria Conurbano - PuTop Games - hecho por lauta", 22).setOrigin(0.5, 0.5));
 
     const _helpbuttonborder = this.textures.get("GJ_button01").source[0].width * 0.3;
     const _helpbtnh = 70;
@@ -9558,6 +9579,22 @@ _applyMirrorEffect() {
     });
     _makesupportButton(containerX + _helpbtnw + _helpBtnGap / 2, "Notes", () => {
       this._showwippopup();
+    });
+
+    // --- Botones de comunidad dentro de Support (a los costados del panel) ---
+    const _supportBadgeScale = 0.5;
+    [
+      { key: "btn_whatsapp", url: "https://whatsapp.com/channel/0029VbDpnc1545uwf4F6ju0Z", dx: -468 },
+      { key: "btn_discord", url: "https://discord.gg/7hbqkDmKHA", dx: 468 }
+    ].forEach((def) => {
+      const badge = this.add.image(containerX + def.dx, _helpBtnY, def.key)
+        .setScale(_supportBadgeScale)
+        .setInteractive();
+      this._helplayer.add(badge);
+      this._expandHitArea(badge, 1);
+      this._makeBouncyButton(badge, _supportBadgeScale, () => {
+        window.open(def.url, "_blank");
+      }, () => !this._helpclose);
     });
 
     const ldmX = _0x2a115c + 160;
