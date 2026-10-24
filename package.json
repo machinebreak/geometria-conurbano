@@ -1,0 +1,8 @@
+{
+    "name": "geometria-conurbano",
+    "version": "1.0.0",
+    "description": "Geometria Conurbano - juego de ritmo y plataformas para navegador. Incluye niveles, creador de niveles y selector de iconos.",
+    "scripts": {
+        "start": "node server.js"
+    }
+}

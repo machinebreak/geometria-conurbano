@@ -1,0 +1,8 @@
+# Dependencias
+/node_modules
+.DS_Store
+*.env*
+*.log
+
+# Backups locales de los atlas (no hacen falta online)
+/_logo_backup
