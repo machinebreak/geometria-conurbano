@@ -7061,6 +7061,12 @@ _showwippopup() {
       }
       this._socialIcons = [];
     }
+    if (this._socialBadges && this._socialBadges.length > 0) {
+      for (const _badge of this._socialBadges) {
+        _dismiss(_badge, { y: screenHeight + 64, duration: 300, ease: "Quad.In" }, () => _badge.destroy());
+      }
+      this._socialBadges = [];
+    }
     _dismiss(this._logo, { y: this._logo ? -this._logo.height : 0, duration: 300, ease: "Quad.In" }, () => {
       this._logo.destroy();
       this._logo = null;
