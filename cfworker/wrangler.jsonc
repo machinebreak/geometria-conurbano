@@ -1,0 +1,11 @@
+{
+  "name": "geometria-conurbano",
+  "main": "index.js",
+  "compatibility_date": "2026-10-24",
+  "routes": [
+    {
+      "pattern": "gd.lauta.site",
+      "custom_domain": true
+    }
+  ]
+}
