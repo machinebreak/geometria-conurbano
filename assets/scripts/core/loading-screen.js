@@ -226,24 +226,11 @@ class BootScene extends Phaser.Scene {
       this.children.bringToTop(brandLogo);
       this.children.bringToTop(gjLogo);
       this.children.bringToTop(Logo);
-      if (window.gameCache) {
-        const originalXhr = this.load.xhrLoader;
-        this.load.xhrLoader = (file) => {
-          const url = file.url;
-          if (window.gameCache.isFileCached(url)) {
-            const cached = window.gameCache.getCachedFile(url);
-            if (cached) {
-              return new Promise((resolve) => {
-                setTimeout(() => { file.data = cached; resolve(file); }, 1);
-              });
-            }
-          }
-          return originalXhr.call(this.load, file).then((result) => {
-            if (result && result.data) window.gameCache.cacheFile(url, result.data);
-            return result;
-          });
-        };
-      }
+      // No volcamos los assets binarios a localStorage (cuota ~5MB, mucho
+      // menos en iOS Safari): con ~75MB de juego eso entraba en un loop de
+      // guardar/limpiar sincrono que colgaba la carga en celulares flojos.
+      // El cache HTTP del navegador + el Cache-Control del Worker ya cachean
+      // estos archivos correctamente.
 
       this.load.atlas("GJ_GameSheet", "assets/sheets/GJ_GameSheet.png", "assets/sheets/GJ_GameSheet.json");
       this.load.atlas("GJ_GameSheet02", "assets/sheets/GJ_GameSheet02.png", "assets/sheets/GJ_GameSheet02.json");
@@ -341,7 +328,27 @@ class BootScene extends Phaser.Scene {
       this.load.on("progress", (value) => {
         if (sliderFill) sliderFill.width = value * 380;
       });
-      this.load.on("loaderror", () => {});
+
+      // Conexiones de celular flojas pierden algun request de vez en cuando.
+      // Antes esto se ignoraba en silencio y la carga quedaba trabada con la
+      // barra a mitad de camino. Ahora reintentamos un par de veces por
+      // archivo y, si de verdad no hay forma, avisamos en vez de colgar.
+      const _retryCounts = new Map();
+      const _failedFiles = [];
+      const MAX_RETRIES = 2;
+      this.load.on("loaderror", (file) => {
+        const retries = _retryCounts.get(file.key) || 0;
+        if (retries < MAX_RETRIES) {
+          _retryCounts.set(file.key, retries + 1);
+          console.warn(`[load] reintentando "${file.key}" (${retries + 1}/${MAX_RETRIES})`, file.src);
+          file.resetXHR();
+          this.load.addFile(file);
+        } else {
+          console.error(`[load] no se pudo cargar "${file.key}"`, file.src);
+          _failedFiles.push(file.key);
+        }
+      });
+
       this.load.once("complete", () => {
         if (sliderFill) sliderFill.width = 380;
         this.time.delayedCall(200, () => {
@@ -349,6 +356,14 @@ class BootScene extends Phaser.Scene {
           if (bigFontData) loadFont(this, "bigFont", bigFontData);
           const gfd = this.cache.text.get("goldFontFnt");
           if (gfd && !this.cache.bitmapFont.has("goldFont")) loadFont(this, "goldFont", gfd);
+
+          if (_failedFiles.length > 0) {
+            console.error("[load] archivos que no cargaron despues de reintentar:", _failedFiles);
+            const warnMsg = this.add.bitmapText(cx, cy + 220, "goldFont",
+              "Algunos archivos no cargaron. Si el juego se ve raro, recarga la pagina.", 18)
+              .setOrigin(0.5).setDepth(999);
+            this.time.delayedCall(6000, () => warnMsg.destroy());
+          }
 
           localStorage.setItem('webdash_assets_loaded', 'true');
           localStorage.setItem('webdash_last_load_time', Date.now().toString());

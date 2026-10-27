@@ -48,6 +48,13 @@ const phaserConfig = {
   },
   backgroundColor: "#000000",
   parent: document.body,
+  loader: {
+    // Celulares con conexiones flojas se quedaban colgados para siempre:
+    // el default de Phaser es sin timeout. Con esto, un request trabado
+    // falla y entra al reintento en vez de trabar la carga entera.
+    timeout: 20000,
+    maxParallelDownloads: 8
+  },
   input: {
     windowEvents: false
   },

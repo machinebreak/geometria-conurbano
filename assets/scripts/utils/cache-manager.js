@@ -56,6 +56,12 @@ class GameCacheManager {
         }
     }
     cacheFile(url, content) {
+        // localStorage tiene ~5MB de cuota (menos todavia en iOS Safari).
+        // Nada de sprite sheets o audio del juego entra ahi: cachear eso
+        // termina en un loop sincrono de guardar/limpiar que cuelga el
+        // hilo principal. Solo vale la pena para archivos chicos de texto.
+        const approxSize = typeof content === "string" ? content.length : JSON.stringify(content).length;
+        if (approxSize > 200 * 1024) return;
         const cacheKey = this.getCacheKey(url);
         const data = {
             content: content,
