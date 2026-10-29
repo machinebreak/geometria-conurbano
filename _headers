@@ -1,0 +1,29 @@
+# Headers de Cloudflare Pages.
+#
+# Sin esto, Pages sirve TODO con "Cache-Control: public, max-age=0",
+# asi que el navegador revalida los ~165 archivos del juego en cada visita
+# y la carga se siente lenta aunque ya este todo descargado.
+#
+# Regla: los assets (imagenes, audio, niveles) se cachean fuerte porque
+# cambian poco; el codigo (html/js) se revalida siempre para que un deploy
+# nuevo se vea al instante.
+#
+# Pages aplica la regla MAS ESPECIFICA que coincida, no la primera.
+
+# Codigo: siempre fresco
+/assets/scripts/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Assets: una semana de cache. Si se actualiza un sprite, se ve al dia siguiente
+# o al hacer un hard refresh.
+/assets/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/wd_branding/*
+  Cache-Control: public, max-age=604800
