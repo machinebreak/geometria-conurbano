@@ -87,18 +87,28 @@ la primera vez que se entra a un nivel con ese fondo (ver
 - **Custom Domain**: `gd.lauta.site`
 - **SSL**: automatico (Cloudflare Universal SSL)
 
-El custom domain necesita **un unico registro DNS**:
+El custom domain usa **un unico registro DNS** (ya creado y activo):
 
 | Tipo | Nombre | Contenido | Proxy |
 |---|---|---|---|
 | CNAME | `gd` | `geometria-conurbano.pages.dev` | Proxied (naranja) |
 
-Se puede crear desde **Cloudflare Dashboard -> lauta.site -> DNS -> Records**,
-o dejando que Pages lo haga solo en
-**Workers & Pages -> geometria-conurbano -> Custom domains -> Add domain**.
+Si hay que recrearlo, se puede hacer desde
+**Cloudflare Dashboard -> lauta.site -> DNS -> Records**, o por API:
 
-Si el token de wrangler no tiene el scope `dns_records:edit`, la API devuelve
-`Authentication error` (code 10000) y hay que crearlo desde el dashboard.
+```bash
+curl -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+  -H "Authorization: Bearer $CF_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"CNAME","name":"gd","content":"geometria-conurbano.pages.dev","proxied":true,"ttl":1}'
+```
+
+El token necesita el permiso **Zone -> DNS -> Edit** sobre `lauta.site`.
+El token OAuth de wrangler **no** sirve para esto: solo tiene scope de Pages y
+devuelve `Authentication error` (code 10000).
+
+El certificado lo emite Cloudflare sola (Google Trust Services) y se renueva sin
+intervencion. `http://` redirige a `https://` con 301.
 
 ---
 
