@@ -459,6 +459,8 @@ class GameScene extends Phaser.Scene {
     const _bgKey = "game_bg_" + getBackgroundTextureIndex(_bgGdId);
     if (this.textures.exists(_bgKey)) {
       this._applyMirroredBackgroundTexture(_bgKey);
+    } else {
+      this._ensureBackgroundTexture(_bgKey, _bgGdId);
     }
     this._level.applyGroundTexture();
     if (this._level._initialColors) {
@@ -7908,6 +7910,34 @@ _showwippopup() {
     this._bg.setTexture(mirroredKey);
     this._bgInitY = sourceHeight > 0 ? sourceHeight - screenHeight - o : 0;
     this._bgMirrorTileHeight = sourceHeight > 0 ? sourceHeight * 2 : 0;
+  }
+
+  // Carga el fondo de un nivel la primera vez que se necesita.
+  // Antes los 59 fondos se precargaban en el boot (~3.9 MB) y en el menu
+  // solo se usa el 01. Si la carga falla, el fondo actual se mantiene.
+  _ensureBackgroundTexture(bgKey, backgroundSetting) {
+    if (this.textures.exists(bgKey)) {
+      this._applyMirroredBackgroundTexture(bgKey);
+      return true;
+    }
+    if (this._bgLoadingKey === bgKey) return false;
+    if (!this.load || this.load.isLoading()) return false;
+    const fileId = String(getBackgroundTextureIndex(backgroundSetting) + 1).padStart(2, "0");
+    const url = "assets/game-bg/game_bg_" + fileId + "_001-hd.webp";
+    this._bgLoadingKey = bgKey;
+    const onDone = () => {
+      this._bgLoadingKey = null;
+      // La escena pudo cerrarse mientras bajaba la imagen.
+      if (!this.scene || !this.scene.isActive()) return;
+      if (this.textures.exists(bgKey) && this._bg) {
+        this._applyMirroredBackgroundTexture(bgKey);
+      }
+    };
+    this.load.once("complete", onDone);
+    this.load.once("loaderror", () => { this._bgLoadingKey = null; });
+    this.load.image(bgKey, url);
+    this.load.start();
+    return false;
   }
 
   _updateBackground() {

@@ -85,7 +85,6 @@ Es HTML + JS estático, no necesita build.
 |---|---|
 | **Dominio** | https://gd.lauta.site |
 | **Cloudflare Pages** | https://geometria-conurbano.pages.dev |
-| **GitHub Pages** | https://machinebreak.github.io/geometria-conurbano |
 
 Los pasos completos están en [`DEPLOY.md`](DEPLOY.md).
 

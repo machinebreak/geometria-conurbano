@@ -303,12 +303,10 @@ class BootScene extends Phaser.Scene {
         }
       }
 
-      for (let i = 1; i < 60; i++) {
-        let index = i - 1;
-        i = String(i);
-        if (i.length < 2) i = "0" + i;
-        this.load.image("game_bg_" + index, "assets/game-bg/game_bg_" + i + "_001-hd.webp");
-      }
+      // Los 59 fondos ya NO se cargan aca: pesan ~3.9 MB y en el menu solo
+      // se usa el 01. El resto se pide bajo demanda al entrar a un nivel
+      // (ver _ensureBackgroundTexture en game-scene.js), asi el arranque
+      // baja de ~13 MB a ~9 MB.
 
       this.load.audio("menu_music", "assets/music/menuLoop.mp3");
       this.load.audio("StayInsideMe", "assets/music/StayInsideMe.mp3");

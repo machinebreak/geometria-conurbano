@@ -3357,6 +3357,8 @@ class LevelEditor {
             if (newBgH) {
                 this._bgInitY = newBgH - screenHeight - o;
             }
+        } else if (this._bg && typeof this._ensureBackgroundTexture === "function") {
+            this._ensureBackgroundTexture(bgKey, numericValue);
         }
     } else if (key === "kA7") {
         window._groundId = getGroundTextureId(numericValue);

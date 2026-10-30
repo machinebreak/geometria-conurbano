@@ -4,14 +4,45 @@
 # asi que el navegador revalida los ~165 archivos del juego en cada visita
 # y la carga se siente lenta aunque ya este todo descargado.
 #
-# Regla: los assets (imagenes, audio, niveles) se cachean fuerte porque
-# cambian poco; el codigo (html/js) se revalida siempre para que un deploy
-# nuevo se vea al instante.
-#
-# Pages aplica la regla MAS ESPECIFICA que coincida, no la primera.
+# IMPORTANTE: Pages CONCATENA las reglas que coinciden (no las sobrescribe).
+# Si /assets/* y /assets/scripts/* coinciden, el navegador lee el primer
+# max-age y termina cacheando el codigo, que es justo lo que no queremos.
+# Por eso las carpetas van listadas una por una, sin solaparse.
 
-# Codigo: siempre fresco
+# Assets pesados: una semana de cache.
+/assets/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/game-bg/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/game-ground/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/levels/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/music/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/sheets/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/sfx/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/sprites/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/wd_branding/*
+  Cache-Control: public, max-age=604800
+
+# Codigo: siempre fresco, para que un deploy nuevo se vea al instante.
+# No lleva comodin de assets para no solaparse con las reglas de arriba.
 /assets/scripts/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/style.css
   Cache-Control: public, max-age=0, must-revalidate
 
 /*.html
@@ -19,11 +50,3 @@
 
 /
   Cache-Control: public, max-age=0, must-revalidate
-
-# Assets: una semana de cache. Si se actualiza un sprite, se ve al dia siguiente
-# o al hacer un hard refresh.
-/assets/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
-
-/wd_branding/*
-  Cache-Control: public, max-age=604800
